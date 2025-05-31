@@ -1,55 +1,137 @@
 .choix-perso {
+  background: #23232b;
+  border-radius: 22px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.35);
+  padding: 38px 36px 32px 36px;
+  margin: 38px auto 0 auto;
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.choix-perso h1 {
+  color: #ffe082;
+  font-size: 1.6rem;
+  font-weight: bold;
+  margin-bottom: 18px;
   text-align: center;
-  margin-top: 30px;
+}
+
+.choix-perso p {
+  color: #e0e0e0;
+  font-size: 1.1rem;
+  margin: 0 0 14px 0;
+  text-align: center;
+}
+
+.choix-perso li {
+  color: #bdbdbd;
+  font-size: 1rem;
+  margin-left: 18px;
+  margin-bottom: 2px;
+}
+
+.choix-perso button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 18px;
+  transition: background 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.choix-perso button:hover {
+  background: #1e40af;
+}
+
+.intro-img {
+  width: 320px;
+  height: 320px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  margin-top: 18px;
 }
 
 .heroes-list {
   display: flex;
-  justify-content: center;
   gap: 24px;
-  margin-top: 20px;
+  margin-top: 24px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .hero-card {
-  background: #f5f5f5;
-  border: 2px solid #ccc;
-  border-radius: 12px;
-  padding: 24px 32px;
-  width: 180px;
+  background: #29293a;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+  padding: 22px 28px;
+  min-width: 140px;
+  text-align: center;
   cursor: pointer;
-  transition: box-shadow 0.2s, border-color 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 2px solid transparent;
+  transition: border 0.2s, transform 0.2s;
+    display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.hero-card.selected,
-.hero-card:hover {
-  border-color: #007bff;
-  box-shadow: 0 4px 16px rgba(0,123,255,0.15);
-  background: #e6f0ff;
+.hero-img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  border-radius: 12px;
+  background: #181824;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.18);
+  margin-bottom: 16px;
+  margin-top: 8px;
+  display: block;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.hero-card.selected .hero-img,
+.hero-card:hover .hero-img {
+  transform: scale(1.12) rotate(-2deg);
+  box-shadow: 0 8px 32px #ffe08255, 0 4px 24px rgba(0,0,0,0.25);
+  border: 2px solid #ffe082;
 }
 
 .hero-card h2 {
-  margin: 0 0 10px 0;
-  color: #333;
+  color: #ffe082;
+  font-size: 1.2rem;
+  margin-bottom: 10px;
 }
 
 .hero-card p {
-  margin: 6px 0;
-  color: #555;
-}
-
-button {
-  margin-top: 20px;
-  padding: 10px 24px;
-  border: none;
-  border-radius: 8px;
-  background: #007bff;
-  color: white;
+  color: #e0e0e0;
   font-size: 1rem;
-  cursor: pointer;
-  transition: background 0.2s;
+  margin: 4px 0;
 }
 
-button:hover {
-  background: #0056b3;
+/* Responsive */
+@media (max-width: 700px) {
+  .choix-perso {
+    padding: 18px 4vw 18px 4vw;
+    max-width: 98vw;
+  }
+  .heroes-list {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+  }
+  .hero-card {
+    min-width: 0;
+    width: 90vw;
+    padding: 18px 0;
+  }
+  .intro-img {
+    width: 90vw;
+    height: auto;
+  }
 }

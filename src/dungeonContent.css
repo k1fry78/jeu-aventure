@@ -1,0 +1,75 @@
+
+
+.page-center {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.donjon-container {
+  background: rgba(30, 30, 40, 0.98);
+  border-radius: 18px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  padding: 32px 40px 24px 40px;
+  margin-top: 32px;
+  max-width: 700px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.donjon-container h2 {
+  color: #f5c542;
+  margin-bottom: 16px;
+}
+
+.donjon-container p {
+  color: #e0e0e0;
+  margin: 0 0 18px 0;
+  text-align: center;
+  font-size: 1.1rem;
+}
+
+.donjon-btns {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 32px;
+}
+
+.donjon-btns button {
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 28px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.donjon-btns button:hover {
+  background: #1e40af;
+}
+
+.donjon-img {
+  width: 380px;
+  height: 380px;
+  object-fit: cover;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  margin-top: 18px;
+}
+
+@media (max-width: 600px) {
+  .donjon-container {
+    padding: 12px 4vw;
+    max-width: 98vw;
+  }
+  .donjon-img {
+    width: 90vw;
+    height: auto;
+  }
+}

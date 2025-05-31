@@ -1,16 +1,58 @@
 .game-section-fixed {
   position: fixed;
   left: 0;
-  right: 0;
   bottom: 0;
-  background: #838383;
-  color: #000000;
-  padding: 16px 0;
-  text-align: center;
+  top: auto;
+  background: #23232b;
+  color: #fff;
+  padding: 28px 24px 18px 24px;
+  text-align: left;
   z-index: 100;
-  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
+  box-shadow: 2px -2px 16px rgba(0,0,0,0.35);
+  border-top-right-radius: 32px;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  max-width: 340px;
+  min-width: 220px;
+  margin: 0;
 }
+
+.game-section-fixed h1 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffe082;
+  letter-spacing: 1px;
+  text-align: left;
+}
+
+.game-section-fixed p {
+  margin: 8px 0;
+  font-size: 1.05rem;
+  color: #e0e0e0;
+  text-align: left;
+}
+
 .hp {
   font-weight: bolder;
-  color: rgb(126, 10, 10);
+  color: #ff5252;
+  font-size: 1.15rem;
+  margin: 10px 0;
+  text-align: left;
+}
+
+/* Responsive pour mobile */
+@media (max-width: 600px) {
+  .game-section-fixed {
+    max-width: 98vw;
+    min-width: unset;
+    padding: 18px 8px 10px 8px;
+    border-top-right-radius: 18px;
+  }
+  .game-section-fixed h1 {
+    font-size: 1.1rem;
+  }
+  .game-section-fixed p {
+    font-size: 0.98rem;
+  }
 }

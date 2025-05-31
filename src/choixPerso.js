@@ -1,14 +1,42 @@
 import React, { useState } from "react";
 import "./choixPerso.css";
 
-function ChoixPerso({ onSelect, onChoosePath }) {
+function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
   const [selectedHero, setSelectedHero] = useState(null);
   const [isHeroChosen, setIsHeroChosen] = useState(false);
+  const [scene, setScene] = useState("intro");
 
   const heroes = [
-    { name: "Guerrier", attackBase: 2, attackUltimate: 10, hpHero: 100 },
-    { name: "Mage", attackBase: 1, attackUltimate: 40, hpHero: 60 },
-    { name: "Rodeur", attackBase: 3, attackUltimate: 20, hpHero: 80 },
+    {
+      name: "Guerrier",
+      attackBase: 2,
+      attackName: "Coup d'épée",
+      attackUltimate: 10,
+      ultimateName: "Coup de bouclier",
+
+      hpHero: 100,
+      img: "/guerrier.jpg", // Mets le chemin de ton image
+    },
+    {
+      name: "Mage",
+      attackBase: 1,
+      attackName: "Coup de bâton",
+      attackUltimate: 40,
+      ultimateName: "Boule de feu",
+
+      hpHero: 60,
+      img: "/mage.jpg",
+    },
+    {
+      name: "Rodeur",
+      attackBase: 3,
+      attackName: "Tir à l'arc",
+      attackUltimate: 20,
+      ultimateName: "Salves de flèches",
+
+      hpHero: 80,
+      img: "/rodeur.jpg",
+    },
   ];
 
   const handleSelect = (hero) => {
@@ -20,62 +48,83 @@ function ChoixPerso({ onSelect, onChoosePath }) {
   if (isHeroChosen && selectedHero) {
     return (
       <div className="choix-perso">
-        <h1>Vous avez choisi : {selectedHero.name}</h1>
-        <button
-          onClick={() => onChoosePath("enter")}>
-        
+        <h1 className="choix-titre">Vous avez choisi : {selectedHero.name}</h1>
+        <button className="choix-btn" onClick={() => onChoosePath("enter")}>
           Entrer au donjon
         </button>
       </div>
     );
   }
 
-  return (
-    <div className="choix-perso">
-        <h1>Bienvenue dans le donjon de l’Éveil</h1>
-      <p>
-        Tu es un aventurier courageux, venu dans ce donjon mystérieux à la
-        recherche d’un artefact légendaire : la Pierre de l’Éveil. On raconte
-        qu’elle accorde à celui qui la trouve une puissance inégalée… mais que
-        personne n’est jamais ressorti vivant du donjon !
-      </p>
-      <p>
-        À chaque embranchement, tu devras faire des choix :
-        <li>
-          
-          Certains chemins sont sombres et dangereux, d’autres semblent plus
-          sûrs mais cachent peut-être des pièges.
-        </li>
-        <li> Des monstres redoutables gardent les trésors du donjon.</li>
-        <li>
-          Après chaque combat, tu pourras améliorer tes compétences pour
-          survivre plus loin.
-        </li>
-      </p>
-      <p>
-        Ton but :
-        <li> Atteindre la salle finale du donjon, </li>
-        <li> Vaincre le gardien ultime,</li>
-        <li>Et t’emparer de la Pierre de l’Éveil !</li>
-      </p>
-
-      <h1>Choisissez votre personnage</h1>
-      <div className="heroes-list">
-        {heroes.map((hero) => (
-          <div
-            key={hero.name}
-            className={`hero-card ${selectedHero === hero ? "selected" : ""}`}
-            onClick={() => handleSelect(hero)}
-          >
-            <h2>{hero.name}</h2>
-            <p>Attaque de base : {hero.attackBase}</p>
-            <p>Attaque ultime : {hero.attackUltimate}</p>
-            <p>Points de vie : {hero.hpHero}</p>
-          </div>
-        ))}
+  if (scene === "intro") {
+    return (
+      <div className="choix-perso">
+        <h1 className="choix-titre">Bienvenue dans le donjon de l’Éveil</h1>
+        <p className="choix-desc">
+          Tu es un aventurier courageux, venu dans ce donjon mystérieux à la
+          recherche d’un artefact légendaire : la Pierre de l’Éveil. On raconte
+          qu’elle accorde à celui qui la trouve une puissance inégalée… mais que
+          personne n’est jamais ressorti vivant du donjon !
+        </p>
+        <ul className="choix-list">
+          <li>
+            Certains chemins sont sombres et dangereux, d’autres semblent plus
+            sûrs mais cachent peut-être des pièges.
+          </li>
+          <li>Des monstres redoutables gardent les trésors du donjon.</li>
+          <li>
+            Après chaque combat, tu pourras améliorer tes compétences pour
+            survivre plus loin.
+          </li>
+        </ul>
+        <ul className="choix-list choix-list-left">
+          <li>Atteindre la salle finale du donjon,</li>
+          <li>Vaincre le gardien ultime,</li>
+          <li>Et t’emparer de la Pierre de l’Éveil !</li>
+        </ul>
+        <button
+          className="choix-btn"
+          onClick={() => {
+            setScene("choix");
+            startMusic && startMusic();
+          }}
+        >
+          Jouer
+        </button>
+        <img src="/pierre-eveil.jpg" alt="dungeon" className="intro-img" />
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (scene === "choix") {
+    return (
+      <div className="choix-perso">
+        <h1 className="choix-titre">Choisissez votre personnage</h1>
+        <div className="heroes-list">
+          {heroes.map((hero) => (
+            <div
+              key={hero.name}
+              className={`hero-card ${selectedHero === hero ? "selected" : ""}`}
+              onClick={() => handleSelect(hero)}
+            >
+              <img
+                src={hero.img}
+                alt={hero.name}
+                className="hero-img"
+                style={{ width: "80px", height: "80px", marginBottom: "12px" }}
+              />
+              <h2 className="hero-name">{hero.name}</h2>
+              <p className="hero-stat">{hero.attackName} : {hero.attackBase} de dégats</p>
+              <p className="hero-stat">
+                {hero.ultimateName} : {hero.attackUltimate} de dégats
+              </p>
+              <p className="hero-stat">Points de vie : {hero.hpHero}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 }
 
 export default ChoixPerso;
