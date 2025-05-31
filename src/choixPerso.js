@@ -78,6 +78,7 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
           </li>
         </ul>
         <ul className="choix-list choix-list-left">
+          <p>Objectifs :</p>
           <li>Atteindre la salle finale du donjon,</li>
           <li>Vaincre le gardien ultime,</li>
           <li>Et t’emparer de la Pierre de l’Éveil !</li>
