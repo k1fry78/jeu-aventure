@@ -6,38 +6,41 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
   const [isHeroChosen, setIsHeroChosen] = useState(false);
   const [scene, setScene] = useState("intro");
 
-  const heroes = [
-    {
-      name: "Guerrier",
-      attackBase: 2,
-      attackName: "Coup d'épée",
-      attackUltimate: 10,
-      ultimateName: "Coup de bouclier",
-
-      hpHero: 100,
-      img: "/guerrier.jpg", // Mets le chemin de ton image
-    },
-    {
-      name: "Mage",
-      attackBase: 1,
-      attackName: "Coup de bâton",
-      attackUltimate: 40,
-      ultimateName: "Boule de feu",
-
-      hpHero: 60,
-      img: "/mage.jpg",
-    },
-    {
-      name: "Rodeur",
-      attackBase: 3,
-      attackName: "Tir à l'arc",
-      attackUltimate: 20,
-      ultimateName: "Salves de flèches",
-
-      hpHero: 80,
-      img: "/rodeur.jpg",
-    },
-  ];
+const heroes = [
+  {
+    name: "Guerrier",
+    attackBase: 7,
+    attackName: "Coup d'épée",
+    attackBaseCooldown: 3000, // 3 seconde
+    attackUltimate: 15,
+    ultimateName: "Coup de bouclier",
+    ultimateCooldown: 8000, // 8 secondes
+    hpHero: 100,
+    img: "/guerrier.jpg",
+  },
+  {
+    name: "Mage",
+    attackBase: 5,
+    attackName: "Coup de bâton",
+    attackBaseCooldown: 4500, // 4.5 seconde
+    attackUltimate: 65,
+    ultimateName: "Boule de feu",
+    ultimateCooldown: 5000, // 5 secondes
+    hpHero: 60,
+    img: "/mage.jpg",
+  },
+  {
+    name: "Rodeur",
+    attackBase: 10,
+    attackName: "Tir à l'arc",
+    attackBaseCooldown: 3000, // 3 seconde
+    attackUltimate: 30,
+    ultimateName: "Salves de flèches",
+    ultimateCooldown: 8000, // 8 secondes
+    hpHero: 80,
+    img: "/rodeur.jpg",
+  },
+];
 
   const handleSelect = (hero) => {
     setSelectedHero(hero);

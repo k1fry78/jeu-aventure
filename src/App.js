@@ -15,7 +15,7 @@ function App() {
 
   const startMusic = () => {
     if (audioRef.current) {
-      audioRef.current.volume = 0.3; // Met le volume à 50%
+      audioRef.current.volume = 0.1; // Met le volume à 20%
       audioRef.current.play();
     }
   };
@@ -111,7 +111,6 @@ function App() {
         <audio
           ref={audioRef}
           controls
-          autoPlay
           loop
           style={{ display: "none" }}
         >

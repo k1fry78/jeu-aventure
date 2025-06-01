@@ -1,5 +1,3 @@
-
-
 .page-center {
   min-height: 100vh;
   display: flex;
@@ -39,19 +37,72 @@
   margin-bottom: 32px;
 }
 
-.donjon-btns button {
+.donjon-btns button,
+.combat-center button {
   background: #2563eb;
   color: #fff;
   border: none;
   border-radius: 8px;
-  padding: 12px 28px;
+  padding: 12px 32px;
   font-size: 1.1rem;
+  margin: 8px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-.donjon-btns button:hover {
+
+.donjon-btns button:hover,
+.combat-center button:hover {
   background: #1e40af;
+}
+
+.donjon-btns button:active,
+.combat-center button:active {
+  background: #1e40af;
+  box-shadow: 0 0 0 2px #fff, 0 0 8px #1e40af;
+}
+
+/* Centrage du bloc combat */
+.combat-center {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 24px;
+}
+
+/* Bouton "Lancer le combat" cliqué */
+.combat-center .combat-launched {
+  background: #22c55e;
+  color: #fff;
+  font-weight: bold;
+  box-shadow: 0 0 0 2px #22c55e, 0 0 8px #22c55e;
+}
+
+/* Message d'alerte */
+.combat-alert {
+  color: #facc15;
+  background: #3f1d00;
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+  margin: 12px 0 8px 0;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+  text-shadow: 1px 1px 2px #000;
+}
+
+/* Points de vie */
+.combat-hp {
+  color: #f87171;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+.combat-hp-hero {
+  color: #38bdf8;
+  font-weight: bold;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
 }
 
 .donjon-img {
@@ -63,6 +114,40 @@
   margin-top: 18px;
 }
 
+/* CSS pour les boutons de loot */
+
+.donjon-btns-loot {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin: 8px 0 16px 0;
+}
+
+.donjon-btns-loot button {
+  min-width: 120px;
+  padding: 7px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  background: linear-gradient(90deg, #fbbf24 60%, #f59e42 100%);
+  color: #222;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 8px #0002;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.donjon-btns-loot button:hover:enabled {
+  background: linear-gradient(90deg, #f59e42 60%, #fbbf24 100%);
+  transform: translateY(-2px) scale(1.05);
+}
+
+.donjon-btns-loot button:disabled {
+  background: #bbb;
+  color: #888;
+  cursor: not-allowed;
+  transform: none;
+}
 @media (max-width: 600px) {
   .donjon-container {
     padding: 12px 4vw;
