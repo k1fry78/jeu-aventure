@@ -15,9 +15,14 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
     if (scene !== "lancerCombat") return;
     if (vampire1Hp <= 0 || (hero && hero.hpHero <= 0)) return;
     let interval = setInterval(() => {
-      const audio = new Audio("/hitBarbare.mp3");
-      audio.volume = 0.3;
-      audio.play();
+      let audio1 = new Audio("/hitBarbare.mp3");
+      audio1.volume = 0.3;
+      audio1.play();
+      audio1.onended = () => {
+        let audio2 = new Audio("/playerhit.mp3");
+        audio2.volume = 0.3;
+        audio2.play();
+      };
       setHero((prevHero) =>
         prevHero
           ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 4, 0) }

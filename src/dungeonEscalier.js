@@ -1,8 +1,40 @@
 import React, { useState } from "react";
 import "./dungeonContent.css";
 
+const QUESTIONS = [
+  {
+    question: "Quel est l’ingrédient principal de la soupe préférée des trolls ?",
+    options: [
+      { text: "Les champignons des marais", correct: false },
+      { text: "Les os de gobelin", correct: true },
+      { text: "Les racines de mandragore", correct: false },
+    ],
+  },
+  {
+    question: "Quel animal les trolls considèrent-ils comme leur plus grand rival ?",
+    options: [
+      { text: "Le loup géant", correct: false },
+      { text: "Le yeti", correct: false },
+      { text: "L’ogre des montagnes", correct: true },
+    ],
+  },
+  {
+    question: "Quelle boisson les trolls servent-ils lors de leurs banquets ?",
+    options: [ 
+      { text: "Le jus de baies sauvages", correct: false },
+      { text: "La bière de mousse", correct: true },
+      { text: "L’eau de source", correct: false },
+    ],
+  },
+];
+
+function getRandomQuestion() {
+  return QUESTIONS[Math.floor(Math.random() * QUESTIONS.length)];
+}
+
 function DungeonEscalier({ onChoosePath }) {
   const [scene, setScene] = useState("");
+  const [questionObj] = useState(getRandomQuestion());
 
   if (scene === "Troll") {
     return (
@@ -15,7 +47,7 @@ function DungeonEscalier({ onChoosePath }) {
             yeux vers toi, surpris, mais ne semble pas hostile. Il te fixe d’un
             air curieux.
           </p>
-          <p>C'est sûr face à lui tu n'as aucune chance...</p>
+          <p>C'est sûr, face à lui tu n'as aucune chance...</p>
           <div className="donjon-btns">
             <button onClick={() => setScene("parler")}>Parler au troll</button>
           </div>
@@ -41,21 +73,18 @@ function DungeonEscalier({ onChoosePath }) {
           <p>
             Il se penche vers toi et demande :
             <br />
-            <em>
-              « Quel est l’ingrédient principal de la soupe préférée des
-              trolls ? »
-            </em>
+            <em>« {questionObj.question} »</em>
           </p>
           <div className="donjon-btns">
-            <button onClick={() => setScene("faux")}>
-              Les champignons des marais
-            </button>
-            <button onClick={() => setScene("vrai")} style={{ marginLeft: "10px" }}>
-              Les os de gobelin
-            </button>
-            <button onClick={() => setScene("faux")} style={{ marginLeft: "10px" }}>
-              Les racines de mandragore
-            </button>
+            {questionObj.options.map((opt, idx) => (
+              <button
+                key={opt.text}
+                onClick={() => setScene(opt.correct ? "vrai" : "faux")}
+                style={idx > 0 ? { marginLeft: "10px" } : {}}
+              >
+                {opt.text}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -70,7 +99,7 @@ function DungeonEscalier({ onChoosePath }) {
           <p>
             La créature éclate de rire, visiblement ravie : « Bien joué ! Peu d’humains connaissent nos traditions.  
             Je vais t’aider : la pierre de l’Éveil se trouve dans les profondeurs du donjon, gardée par un ancien esprit.  
-            En sortant d'ici, continue de monter par les escaliers. Tu devrais t'en rapprocher... Mais prends garde, le chemin est semé d’embûches… »
+            En sortant d'ici, continue de monter par les escaliers. Tu devrais t'en rapprocher... Et souviens-toi que rocambole ouvre les portes les plus secrètes du donjon... Mais prends garde, le chemin est semé d’embûches… »
           </p>
           <div className="donjon-btns">
             <button onClick={() => onChoosePath && onChoosePath("suiteAventure")}>
@@ -107,7 +136,7 @@ function DungeonEscalier({ onChoosePath }) {
       <div className="donjon-container">
         <h2>L’Escalier de Pierre</h2>
         <p>
-          Tu montes prudemment les marches de l’escalier, guidé par la lueur
+          Tu sembles avoir réussi à semer les gardes. Tu montes prudemment les marches de l’escalier, guidé par la lueur
           vacillante des torches. L’air se charge d’une forte odeur de viande
           rôtie et de fumée. Au sommet, le couloir débouche sur une immense porte
           en bois massif. Derrière, tu entends des bruits de mastication, des

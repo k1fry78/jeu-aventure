@@ -55,10 +55,19 @@ function CombatButtons({
     }, 1000);
     return () => clearInterval(ultimateTimerRef.current);
   }, [ultimateCooldown, hero.ultimateCooldown]);
-
   // Attaque de base avec cooldown
   const handleBaseAttack = () => {
     if (scene !== "lancerCombat" || baseCooldown) return;
+    // Son pour chaque héros
+    let sonBase = "";
+    if (hero.name === "Guerrier") sonBase = "/guerrier-attackbase.mp3";
+    else if (hero.name === "Mage") sonBase = "/mage-attackbase.mp3";
+    else if (hero.name === "Rodeur") sonBase = "/rodeur-attackbase.mp3";
+    if (sonBase) {
+      const audio = new Audio(sonBase);
+      audio.volume = 0.3;
+      audio.play();
+    }
     setEnemyHp((hp) => Math.max(hp - hero?.attackBase, 0));
     setBaseCooldown(true);
   };
