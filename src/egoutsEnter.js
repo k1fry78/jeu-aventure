@@ -1,18 +1,28 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CombatButtons from "./combatButtons";
 import FunctionObjet from "./functionobjet.js";
 
 function EnterEgouts({ hero, setHero, onChoosePath }) {
   const [ratHp, setRatHp] = useState(160);
+  const ratXpGiven = useRef(false);
   const [enemyName, setEnemyName] = useState("Rat Géant");
   const [objetChoisi, setObjetChoisi] = useState(null);
   const [scene, setScene] = useState("");
+  const [invincibleUntil, setInvincibleUntil] = useState(0);
+  const [stunStates, setStunStates] = useState({}); // Ajoute ceci en haut
+
+  const isStunned = (enemyName) => {
+    const now = Date.now();
+    return stunStates[enemyName] && stunStates[enemyName] > now;
+  };
 
   // Le rat attaque toutes les 2 secondes
   useEffect(() => {
     if (scene !== "lancerCombat") return;
     if (ratHp <= 0 || (hero && hero.hpHero <= 0)) return;
     let interval = setInterval(() => {
+      if (isStunned(enemyName)) return;
+      if (invincibleUntil && Date.now() < invincibleUntil) return;
       let audio1 = new Audio("/hitBarbare.mp3");
       audio1.volume = 0.3;
       audio1.play();
@@ -23,7 +33,7 @@ function EnterEgouts({ hero, setHero, onChoosePath }) {
       };
       setHero((prevHero) =>
         prevHero
-          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 6, 0) }
+          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 8, 0) }
           : prevHero
       );
     }, 2000);
@@ -31,7 +41,17 @@ function EnterEgouts({ hero, setHero, onChoosePath }) {
     return () => {
       clearInterval(interval);
     };
-  }, [hero, setHero, ratHp, scene]);
+  }, [hero, setHero, ratHp, scene, enemyName, stunStates, invincibleUntil]);
+
+  // Donne 100 XP à la victoire, une seule fois
+  useEffect(() => {
+    if (ratHp <= 0 && !ratXpGiven.current) {
+      setHero((prevHero) =>
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 100 } : prevHero
+      );
+      ratXpGiven.current = true;
+    }
+  }, [ratHp, setHero]);
 
   // Victoire
   if (ratHp <= 0) {
@@ -52,7 +72,7 @@ function EnterEgouts({ hero, setHero, onChoosePath }) {
           </p>
           <div className="donjon-btns">
             <button
-              onClick={() => onChoosePath && onChoosePath("dungeonCouloir")}
+              onClick={() => onChoosePath && onChoosePath("dungeonCellules")}
               disabled={!objetChoisi}
             >
               Continuer l'aventure
@@ -101,11 +121,13 @@ function EnterEgouts({ hero, setHero, onChoosePath }) {
         </p>
         <CombatButtons
           hero={hero}
-          enemyHp={ratHp}
-          setEnemyHp={setRatHp}
+          setHero={setHero}
+          enemies={[{ name: enemyName, hp: ratHp, setHp: setRatHp }]}
           scene={scene}
           setScene={setScene}
-          enemyName={enemyName}
+          setStunStates={setStunStates}
+          stunStates={stunStates}
+          setInvincibleUntil={setInvincibleUntil}
         />
         <img
           src="/ratgeant.jpg"

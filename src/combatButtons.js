@@ -1,92 +1,147 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useRef } from "react";
+
+function getSkillDamage(skill) {
+  if (typeof skill.baseDamage === "number") {
+    return skill.baseDamage + ((skill.level ? skill.level - 1 : 0) * (skill.damagePerLevel || 0));
+  }
+  return 0;
+}
 
 function CombatButtons({
   hero,
-  enemyHp,
-  setEnemyHp,
+  enemies, // [{ name, hp, setHp }]
   scene,
   setScene,
-  enemyName,
+  stunStates,
+  setStunStates,
+  setInvincibleUntil,
+  setHero, // Ajoute ceci pour mettre à jour la mana du héros
 }) {
-  const [baseCooldown, setBaseCooldown] = useState(false);
-  const [ultimateCooldown, setUltimateCooldown] = useState(false);
-  const [canUseUltimate, setCanUseUltimate] = useState(true);
-  const [ultimateTimer, setUltimateTimer] = useState(0);
-  const [baseTimer, setBaseTimer] = useState(0);
-  const baseTimerRef = useRef(null);
-  const ultimateTimerRef = useRef(null);
+  const [skillsCooldowns, setSkillsCooldowns] = useState({});
+  const [selectedSkill, setSelectedSkill] = useState(null);
+  const skillRefs = useRef({});
+  const enemyRefs = useRef({});
+  const [damageDisplays, setDamageDisplays] = useState({});
+  const [baseOverride, setBaseOverride] = useState(null); // Pour le buff criDeGuerre
 
-  // Gestion du cooldown de l'attaque de base
-  useEffect(() => {
-    if (!baseCooldown) return;
-    setBaseTimer(Math.floor(hero.attackBaseCooldown / 1000));
-    baseTimerRef.current = setInterval(() => {
-      setBaseTimer((t) => {
-        if (t <= 1) {
-          clearInterval(baseTimerRef.current);
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    const timeout = setTimeout(() => {
-      setBaseCooldown(false);
-    }, hero.attackBaseCooldown);
-    return () => {
-      clearTimeout(timeout);
-      clearInterval(baseTimerRef.current);
-    };
-  }, [baseCooldown, hero.attackBaseCooldown]);
-
-  // Gestion du cooldown de l'ultimate
-  useEffect(() => {
-    if (!ultimateCooldown) return;
-    setUltimateTimer(Math.floor(hero.ultimateCooldown / 1000));
-    ultimateTimerRef.current = setInterval(() => {
-      setUltimateTimer((t) => {
-        if (t <= 1) {
-          clearInterval(ultimateTimerRef.current);
-          setUltimateCooldown(false);
-          setCanUseUltimate(true);
-          return 0;
-        }
-        return t - 1;
-      });
-    }, 1000);
-    return () => clearInterval(ultimateTimerRef.current);
-  }, [ultimateCooldown, hero.ultimateCooldown]);
-  // Attaque de base avec cooldown
-  const handleBaseAttack = () => {
-    if (scene !== "lancerCombat" || baseCooldown) return;
-    // Son pour chaque héros
-    let sonBase = "";
-    if (hero.name === "Guerrier") sonBase = "/guerrier-attackbase.mp3";
-    else if (hero.name === "Mage") sonBase = "/mage-attackbase.mp3";
-    else if (hero.name === "Rodeur") sonBase = "/rodeur-attackbase.mp3";
-    if (sonBase) {
-      const audio = new Audio(sonBase);
-      audio.volume = 0.3;
-      audio.play();
-    }
-    setEnemyHp((hp) => Math.max(hp - hero?.attackBase, 0));
-    setBaseCooldown(true);
+  // Vérifie si un ennemi est stun
+  const isStunned = (enemyName) => {
+    const now = Date.now();
+    return stunStates[enemyName] && stunStates[enemyName] > now;
   };
 
-  // Attaque ultime avec cooldown
-  const handleUltimate = () => {
-    if (scene !== "lancerCombat" || !canUseUltimate || ultimateCooldown) return;
-    let sonUltimate = "";
-    if (hero.name === "Guerrier") sonUltimate = "/coup-bouclier.mp3";
-    else if (hero.name === "Mage") sonUltimate = "/fireball.mp4";
-    else if (hero.name === "Rodeur") sonUltimate = "/arrows.mp3";
-    if (sonUltimate) {
-      const audio = new Audio(sonUltimate);
-      audio.volume = 0.3;
+  // Affiche temporairement les dégâts sur la carte ennemie
+  const showDamage = (enemyName, value) => {
+    setDamageDisplays((prev) => ({
+      ...prev,
+      [enemyName]: { value, visible: true },
+    }));
+    setTimeout(() => {
+      setDamageDisplays((prev) => ({
+        ...prev,
+        [enemyName]: { ...prev[enemyName], visible: false },
+      }));
+    }, 800);
+  };
+
+  // Sélection d'un skill
+  const handleSelectSkill = (key, skill) => {
+    if (scene !== "lancerCombat" || skillsCooldowns[key]) return;
+    setSelectedSkill({ key, skill });
+  };
+
+  // Application du skill à l'ennemi ciblé
+  const handleAttackEnemy = (enemyIndex) => {
+    if (!selectedSkill || !enemies[enemyIndex] || enemies[enemyIndex].hp <= 0)
+      return;
+    const { key, skill } = selectedSkill;
+
+    // Vérifie la mana
+    if (hero.manaHero < (skill.cost || 0)) {
+      alert("Pas assez de mana !");
+      return;
+    }
+
+    // Retire la mana du héros
+    setHero &&
+      setHero((prev) => ({
+        ...prev,
+        manaHero: prev.manaHero - (skill.cost || 0),
+      }));
+
+    // Active le buff criDeGuerre
+    if (key === "criDeGuerre") {
+      setBaseOverride({ damage: 60, expires: Date.now() + 12000 });
+      setTimeout(() => setBaseOverride(null), 12000);
+    }
+
+    // Active le buff Protection (invincibilité)
+    if (key === "protection" && typeof setInvincibleUntil === "function") {
+      setInvincibleUntil(Date.now() + 8000);
+      setTimeout(() => setInvincibleUntil(0), 8000);
+    }
+
+    if (skill.audio) {
+      const audio = new Audio(`/${skill.audio}`);
+      audio.volume = 0.5;
       audio.play();
     }
-    setEnemyHp((hp) => Math.max(hp - hero?.attackUltimate, 0));
-    setCanUseUltimate(false);
-    setUltimateCooldown(true);
+
+    // Si le skill est multiple, applique les dégâts à tous les ennemis vivants
+    if (skill.multiple) {
+      enemies.forEach((enemy) => {
+        if (enemy.hp > 0) {
+          let dmg = getSkillDamage(skill);
+          // Applique le buff si attaque de base
+          if (key === "base" && baseOverride && baseOverride.expires > Date.now()) {
+            dmg = baseOverride.damage;
+          }
+          enemy.setHp((hp) => Math.max(hp - dmg, 0));
+          showDamage(enemy.name, -dmg);
+          // Applique le stun si présent
+          if (skill.stun) {
+            setStunStates((prev) => ({
+              ...prev,
+              [enemy.name]: Date.now() + skill.stun,
+            }));
+          }
+        }
+      });
+    } else {
+      let dmg = getSkillDamage(skill);
+      // Applique le buff si attaque de base
+      if (key === "base" && baseOverride && baseOverride.expires > Date.now()) {
+        dmg = baseOverride.damage;
+      }
+      enemies[enemyIndex].setHp((hp) => Math.max(hp - dmg, 0));
+      showDamage(enemies[enemyIndex].name, -dmg);
+      // Applique le stun si présent
+      if (skill.stun) {
+        setStunStates((prev) => ({
+          ...prev,
+          [enemies[enemyIndex].name]: Date.now() + skill.stun,
+        }));
+      }
+    }
+
+    // Gère le cooldown
+    if (skill.cooldown) {
+      setSkillsCooldowns((prev) => ({ ...prev, [key]: skill.cooldown / 1000 }));
+      let timer = skill.cooldown / 1000;
+      const interval = setInterval(() => {
+        timer--;
+        setSkillsCooldowns((prev) => ({ ...prev, [key]: timer }));
+        if (timer <= 0) {
+          clearInterval(interval);
+          setSkillsCooldowns((prev) => {
+            const copy = { ...prev };
+            delete copy[key];
+            return copy;
+          });
+        }
+      }, 1000);
+    }
+    setSelectedSkill(null); // Désélectionne le skill après attaque
   };
 
   return (
@@ -98,47 +153,104 @@ function CombatButtons({
       >
         {scene === "lancerCombat" ? "Combat lancé !" : "Lancer le combat"}
       </button>
-      <h2>Combat : {enemyName}</h2>
-      <div className="combat-alert">Attention il t'attaque !</div>
-      <p className="combat-hp">
-        Points de vie {enemyName} : {enemyHp}
-      </p>
-      <p className="combat-hp-hero">
-        Vos points de vie : {hero ? hero.hpHero : "?"}
-      </p>
       <div className="donjon-btns">
-        <button
-          onClick={handleBaseAttack}
-          disabled={
-            enemyHp <= 0 || !hero || scene !== "lancerCombat" || baseCooldown
-          }
-        >
-          {hero ? hero.attackName : "Attaque de base"}
-          {baseCooldown && (
-            <span style={{ marginLeft: "8px", color: "#f55" }}>
-              ({baseTimer}s)
-            </span>
+        {hero &&
+          hero.skillsTree &&
+          Object.entries(hero.skillsTree).map(
+            ([key, skill]) =>
+              skill.unlocked && (
+                <button
+                  key={key}
+                  ref={(el) => (skillRefs.current[key] = el)}
+                  className={`skill-btn${
+                    selectedSkill && selectedSkill.key === key
+                      ? " selected"
+                      : ""
+                  }`}
+                  onClick={() => handleSelectSkill(key, skill)}
+                  disabled={scene !== "lancerCombat" || skillsCooldowns[key]}
+                  title={`${skill.description}\nDégâts : ${
+                    key === "base" && baseOverride && baseOverride.expires > Date.now()
+                      ? baseOverride.damage
+                      : getSkillDamage(skill)
+                  }\nMana : ${skill.cost || 0}`}
+                >
+                  {skill.name}
+                  {skillsCooldowns[key] && (
+                    <span style={{ marginLeft: "8px", color: "#f55" }}>
+                      ({skillsCooldowns[key]}s)
+                    </span>
+                  )}
+                  {key === "base" && baseOverride && baseOverride.expires > Date.now() && (
+                    <span style={{ marginLeft: "8px", color: "#2196f3" }}>
+                      +Buff!
+                    </span>
+                  )}
+                  {skill.cost ? (
+                    <span style={{ marginLeft: "8px", color: "#38bdf8" }}>
+                      -{skill.cost} mana
+                    </span>
+                  ) : null}
+                </button>
+              )
           )}
-        </button>
-        <button
-          onClick={handleUltimate}
-          disabled={
-            !canUseUltimate ||
-            ultimateCooldown ||
-            enemyHp <= 0 ||
-            !hero ||
-            scene !== "lancerCombat"
-          }
-          style={{ marginLeft: "10px" }}
-        >
-          {hero ? hero.ultimateName : "Attaque Ultime"}
-          {ultimateCooldown && (
-            <span style={{ marginLeft: "8px", color: "#f55" }}>
-              ({ultimateTimer}s)
-            </span>
-          )}
-        </button>
       </div>
+      <div className="enemies-row">
+        {enemies.map((enemy, idx) => (
+          <div
+            key={enemy.name}
+            ref={(el) => (enemyRefs.current[enemy.name] = el)}
+            className={`enemy-card${enemy.hp <= 0 ? " defeated" : ""}${
+              isStunned(enemy.name) ? " stunned" : ""
+            }`}
+            onClick={() => handleAttackEnemy(idx)}
+            style={{
+              border: selectedSkill ? "2px solid #3b82f6" : "1px solid #ccc",
+              cursor: selectedSkill && enemy.hp > 0 ? "pointer" : "not-allowed",
+              opacity: enemy.hp <= 0 ? 0.5 : 1,
+              margin: "10px",
+              padding: "10px",
+              display: "inline-block",
+              minWidth: "120px",
+              position: "relative",
+              background: isStunned(enemy.name) ? "#b3e0ff" : "white",
+            }}
+          >
+            <h4>{enemy.name}</h4>
+            <p>PV : {enemy.hp}</p>
+            {isStunned(enemy.name) && (
+              <span style={{ color: "#2196f3", fontWeight: "bold" }}>
+                Stun !
+              </span>
+            )}
+            {damageDisplays[enemy.name]?.visible && (
+              <span
+                style={{
+                  position: "absolute",
+                  top: 5,
+                  right: 10,
+                  color: "#f55",
+                  fontWeight: "bold",
+                  fontSize: "1.2em",
+                  pointerEvents: "none",
+                  animation: "fadeUp 0.8s",
+                }}
+              >
+                {damageDisplays[enemy.name].value}
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
+      {/* Animation CSS */}
+      <style>
+        {`
+          @keyframes fadeUp {
+            0% { opacity: 1; transform: translateY(0);}
+            100% { opacity: 0; transform: translateY(-30px);}
+          }
+        `}
+      </style>
     </div>
   );
 }

@@ -1,19 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import CombatButtons from "./combatButtons";
 import "./dungeonContent.css";
 import FunctionObjet from "./functionobjet.js";
 
 function DungeonCouloir({ onChoosePath, hero, setHero }) {
   const [barbareHp, setBarbareHp] = useState(200);
+  const barbareXpGiven = useRef(false);
   const [enemyName, setEnemyName] = useState("Barbare");
   const [objetChoisi, setObjetChoisi] = useState(null);
   const [scene, setScene] = useState("");
+  const [invincibleUntil, setInvincibleUntil] = useState(0);
+  const [stunStates, setStunStates] = useState({});
+
+  const isStunned = (enemyName) => {
+    const now = Date.now();
+    return stunStates[enemyName] && stunStates[enemyName] > now;
+  };
 
   // Le barbare attaque toutes les 3 secondes
   useEffect(() => {
     if (scene !== "lancerCombat") return;
     if (barbareHp <= 0 || (hero && hero.hpHero <= 0)) return;
     let interval = setInterval(() => {
+      if (isStunned(enemyName)) return;
+      if (invincibleUntil && Date.now() < invincibleUntil) return;
+
       let audio1 = new Audio("/massivattack.mp3");
       audio1.volume = 0.3;
       audio1.play();
@@ -24,7 +35,7 @@ function DungeonCouloir({ onChoosePath, hero, setHero }) {
       };
       setHero((prevHero) =>
         prevHero
-          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 10, 0) }
+          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 15, 0) }
           : prevHero
       );
     }, 3000);
@@ -32,7 +43,17 @@ function DungeonCouloir({ onChoosePath, hero, setHero }) {
     return () => {
       clearInterval(interval);
     };
-  }, [hero, setHero, barbareHp, scene]);
+  }, [hero, setHero, barbareHp, scene, enemyName, stunStates, invincibleUntil]);
+
+  // Donne 100 XP à la victoire, une seule fois
+  useEffect(() => {
+    if (barbareHp <= 0 && !barbareXpGiven.current) {
+      setHero((prevHero) =>
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 100 } : prevHero
+      );
+      barbareXpGiven.current = true;
+    }
+  }, [barbareHp, setHero]);
 
   // Victoire
   if (barbareHp <= 0) {
@@ -114,11 +135,13 @@ function DungeonCouloir({ onChoosePath, hero, setHero }) {
         </p>
         <CombatButtons
           hero={hero}
-          enemyHp={barbareHp}
-          setEnemyHp={setBarbareHp}
+          setHero={setHero}
+          enemies={[{ name: enemyName, hp: barbareHp, setHp: setBarbareHp }]}
           scene={scene}
           setScene={setScene}
-          enemyName={enemyName}
+          setStunStates={setStunStates}
+          stunStates={stunStates}
+          setInvincibleUntil={setInvincibleUntil}
         />
         <img
           src="/barbare.jpg"

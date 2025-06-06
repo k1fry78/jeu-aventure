@@ -8,7 +8,7 @@
   padding: 28px 24px 18px 24px;
   text-align: left;
   z-index: 100;
-  box-shadow: 2px -2px 16px rgba(0,0,0,0.35);
+  box-shadow: 2px -2px 16px rgba(0, 0, 0, 0.35);
   border-top-right-radius: 32px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
@@ -39,6 +39,105 @@
   font-size: 1.15rem;
   margin: 10px 0;
   text-align: left;
+}
+/* SKILLS TREE */
+.skills-tree-mage {
+  float: left;
+  width: 270px;
+  margin-bottom: 20px;
+  margin-right: 32px;
+  background: #23232b;
+  border-radius: 12px;
+  padding: 18px 12px 10px 12px;
+  color: #facc15;
+  font-family: "Segoe UI", Arial, sans-serif;
+  box-shadow: 0 2px 8px #0004;
+}
+.skills-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #facc15;
+  text-align: center;
+  letter-spacing: 1px;
+}
+.skills-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.skill-node {
+  background: #353545;
+  border-radius: 8px;
+  padding: 6px 14px;
+  margin: 4px auto;
+  font-size: 1em;
+  font-weight: 500;
+  color: #fff;
+  min-width: 90px;
+  text-align: center;
+  box-shadow: 0 1px 4px #0002;
+}
+.skills-branches {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
+}
+.skills-branches > div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.utilitaires-right {
+  position: fixed;
+  right: 0;
+  bottom: 0;
+  width: 320px;
+  background: #23232b;
+  color: #fff;
+  border-left: 2px solid #eab308;
+  border-top: 2px solid #eab308;
+  padding: 28px 24px 18px 24px;
+  z-index: 100;
+  min-height: 200px;
+  box-shadow: -2px -2px 16px rgba(0, 0, 0, 0.35);
+  border-top-left-radius: 32px;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom-left-radius: 0;
+  margin: 0;
+}
+
+.utilitaires-right h1 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  color: #ffe082;
+  letter-spacing: 1px;
+  text-align: left;
+}
+
+.utilitaires-right p {
+  margin: 8px 0;
+  font-size: 1.05rem;
+  color: #e0e0e0;
+  text-align: left;
+}
+
+/* Responsive : les deux sections deviennent empilées sur mobile */
+@media (max-width: 900px) {
+  .game-section-fixed,
+  .utilitaires-right {
+    position: static;
+    width: 100%;
+    min-height: unset;
+    border: none;
+    box-shadow: none;
+    padding: 16px;
+    border-radius: 0;
+  }
 }
 
 /* Responsive pour mobile */

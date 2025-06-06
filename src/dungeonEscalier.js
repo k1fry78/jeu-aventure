@@ -99,10 +99,10 @@ function DungeonEscalier({ onChoosePath }) {
           <p>
             La créature éclate de rire, visiblement ravie : « Bien joué ! Peu d’humains connaissent nos traditions.  
             Je vais t’aider : la pierre de l’Éveil se trouve dans les profondeurs du donjon, gardée par un ancien esprit.  
-            En sortant d'ici, continue de monter par les escaliers. Tu devrais t'en rapprocher... Et souviens-toi que rocambole ouvre les portes les plus secrètes du donjon... Mais prends garde, le chemin est semé d’embûches… »
+             Suis ce couloir, humain. Mais prends garde : les esprits qui hantent ces lieux n’aiment pas les intrus. Et souviens-toi que rocambole ouvre les portes les plus secrètes du donjon... Mais prends garde, le chemin est semé d’embûches… »
           </p>
           <div className="donjon-btns">
-            <button onClick={() => onChoosePath && onChoosePath("suiteAventure")}>
+            <button onClick={() => onChoosePath && onChoosePath("dungeonSpectreCombat")}>
               Continuer l’aventure
             </button>
           </div>

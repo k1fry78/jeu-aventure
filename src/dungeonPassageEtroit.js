@@ -8,13 +8,24 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
   const [objetChoisi, setObjetChoisi] = useState(null);
   const [vampire1Hp, setVampire1Hp] = useState(80);
   const [vampire2Hp, setVampire2Hp] = useState(80);
-  const [enemyName, setEnemyName] = useState("Vampire 1, Vampire 2");
+  const [vampire1XpGiven, setVampire1XpGiven] = useState(false);
+  const [vampire2XpGiven, setVampire2XpGiven] = useState(false);
+  const [stunStates, setStunStates] = useState({});
+  const [invincibleUntil, setInvincibleUntil] = useState(0);
 
-  // Le 1er vampire attaque toutes les 2 secondes de 5 dégats
+  const isStunned = (enemyName) => {
+    const now = Date.now();
+    return stunStates[enemyName] && stunStates[enemyName] > now;
+  };
+
+  // Le 1er vampire attaque toutes les 2 secondes de 4 dégâts
   useEffect(() => {
     if (scene !== "lancerCombat") return;
     if (vampire1Hp <= 0 || (hero && hero.hpHero <= 0)) return;
     let interval = setInterval(() => {
+      if (isStunned("Vampire 1")) return;
+      if (invincibleUntil && Date.now() < invincibleUntil) return;
+
       let audio1 = new Audio("/hitBarbare.mp3");
       audio1.volume = 0.3;
       audio1.play();
@@ -25,7 +36,7 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
       };
       setHero((prevHero) =>
         prevHero
-          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 4, 0) }
+          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 11, 0) }
           : prevHero
       );
     }, 2000);
@@ -33,28 +44,51 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
     return () => {
       clearInterval(interval);
     };
-  }, [vampire1Hp, scene]);
+  }, [vampire1Hp, scene, hero, setHero, stunStates, invincibleUntil]);
 
-  // Le 2ème vampire attaque toutes les 3 secondes de 5 dégats
+  // Donne 50 XP à la victoire du 1er vampire, une seule fois
+  useEffect(() => {
+    if (vampire1Hp <= 0 && !vampire1XpGiven) {
+      setHero((prevHero) =>
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 50 } : prevHero
+      );
+      setVampire1XpGiven(true);
+    }
+  }, [vampire1Hp, setHero, vampire1XpGiven]);
+
+  // Le 2ème vampire attaque toutes les 3 secondes de 3 dégâts
   useEffect(() => {
     if (scene !== "lancerCombat") return;
     if (vampire2Hp <= 0 || (hero && hero.hpHero <= 0)) return;
     let interval = setInterval(() => {
+      if (isStunned("Vampire 2")) return;
+      if (invincibleUntil && Date.now() < invincibleUntil) return;
+
       const audio = new Audio("/hitBarbare.mp3");
       audio.volume = 0.3;
       audio.play();
       setHero((prevHero) =>
         prevHero
-          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 3, 0) }
+          ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 9, 0) }
           : prevHero
       );
-    }, 3000);
+    }, 2000);
 
     return () => {
       clearInterval(interval);
     };
-  }, [vampire2Hp, scene]);
+  }, [vampire2Hp, scene, hero, setHero, stunStates, invincibleUntil]);
 
+  // Donne 50 XP à la victoire du 2ème vampire, une seule fois
+  useEffect(() => {
+    if (vampire2Hp <= 0 && !vampire2XpGiven) {
+      setHero((prevHero) =>
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 50 } : prevHero
+      );
+      setVampire2XpGiven(true);
+    }
+  }, [vampire2Hp, setHero, vampire2XpGiven]);
+ 
   // Vue spéciale si le joueur tente de fuir
   if (scene === "fuite") {
     return (
@@ -113,7 +147,7 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
           )}
           <div className="donjon-btns">
             <button
-              onClick={() => onChoosePath && onChoosePath("combatVampires")}
+              onClick={() => onChoosePath && onChoosePath("dungeonCellules")}
               style={{ marginLeft: "10px" }}
             >
               Continuer l'aventure
@@ -146,7 +180,7 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
           </p>
           <div className="donjon-btns">
             <button
-              onClick={() => onChoosePath && onChoosePath("dungeonEscalier")}
+              onClick={() => onChoosePath && onChoosePath("dungeonCellules")}
               style={{ marginLeft: "10px" }}
             >
               Continuer l'aventure
@@ -209,22 +243,21 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
             autour de toi, sifflant et grognant. Le combat commence, ta vie ne
             tient plus qu’à un fil face à ces créatures assoiffées de sang…
           </p>
-          <CombatButtons
-            hero={hero}
-            enemyHp={vampire1Hp}
-            setEnemyHp={setVampire1Hp}
-            scene={scene}
-            setScene={setScene}
-            enemyName="Vampire 1"
-          />
-          <CombatButtons
-            hero={hero}
-            enemyHp={vampire2Hp}
-            setEnemyHp={setVampire2Hp}
-            scene={scene}
-            setScene={setScene}
-            enemyName="Vampire 2"
-          />
+          <div className="combat-btns-row">
+            <CombatButtons
+              hero={hero}
+              setHero={setHero}
+              enemies={[
+                { name: "Vampire 1", hp: vampire1Hp, setHp: setVampire1Hp },
+                { name: "Vampire 2", hp: vampire2Hp, setHp: setVampire2Hp },
+              ]}
+              scene={scene}
+              setScene={setScene}
+              setStunStates={setStunStates}
+              stunStates={stunStates}
+              setInvincibleUntil={setInvincibleUntil}
+            />
+          </div>
           <img
             src="/vampires-attack.png"
             alt="Combat contre la horde"

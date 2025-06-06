@@ -1,5 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./choixPerso.css";
+import { mageSkillsTree } from "./mageSkillsTree";
+import { rodeurSkillsTree } from "./rodeurSkillsTree";
+import { guerrierSkillsTree } from "./guerrierSkillsTree";
+
+// Copie profonde qui garde les getters (get damage)
+function deepCopySkillsTree(skillsTree) {
+  const copy = {};
+  for (const key in skillsTree) {
+    // Copie toutes les propriétés, y compris les getters
+    const descs = Object.getOwnPropertyDescriptors(skillsTree[key]);
+    copy[key] = Object.defineProperties({}, descs);
+    // Copie le tableau children si présent
+    if (skillsTree[key].children) {
+      copy[key].children = [...skillsTree[key].children];
+    }
+  }
+  return copy;
+}
 
 function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
   const [selectedHero, setSelectedHero] = useState(null);
@@ -9,43 +27,54 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
   const heroes = [
     {
       name: "Guerrier",
-      attackBase: 12,
-      attackName: "Coup d'épée",
-      attackBaseCooldown: 3000, // 3 seconde
-      attackUltimate: 15,
-      ultimateName: "Coup de bouclier",
-      ultimateCooldown: 8000, // 8 secondes
       hpHero: 150,
+      manaHero: 100,
       img: "/guerrier.jpg",
+      skillsTree: guerrierSkillsTree,
+      xp: 0,
+      level: 1,
+      skillsTreeDescription: "Puissance, Rapidité, Cris",
+      passif: "Résistance accrue",
+      classe: "guerrier",
+      potions: { vie: 3, mana: 3 },
     },
     {
       name: "Mage",
-      attackBase: 5,
-      attackName: "Coup de bâton",
-      attackBaseCooldown: 4500, // 4.5 seconde
-      attackUltimate: 65,
-      ultimateName: "Boule de feu",
-      ultimateCooldown: 5000, // 5 secondes
       hpHero: 80,
+      manaHero: 100,
       img: "/mage.jpg",
+      skillsTree: mageSkillsTree,
+      xp: 0,
+      level: 1,
+      skillsTreeDescription: "Feu, Glace, Foudre",
+      passif: "Régénération de mana",
+      classe: "mage",
+      potions: { vie: 3, mana: 3},
     },
     {
       name: "Rodeur",
-      attackBase: 15,
-      attackName: "Tir à l'arc",
-      attackBaseCooldown: 3000, // 3 seconde
-      attackUltimate: 30,
-      ultimateName: "Salves de flèches",
-      ultimateCooldown: 8000, // 8 secondes
       hpHero: 90,
+      manaHero: 100,
       img: "/rodeur.jpg",
+      skillsTree: rodeurSkillsTree,
+      xp: 0,
+      level: 1,
+      skillsTreeDescription: "Arc, Dague, Pièges",
+      passif: "Discrétion accrue",
+      classe: "rodeur",
+      potions: { vie: 3, mana: 3 },
     },
   ];
 
+  // Copie indépendante du skillsTree pour chaque héros sélectionné, AVEC les getters
   const handleSelect = (hero) => {
-    setSelectedHero(hero);
+    const heroCopy = {
+      ...hero,
+      skillsTree: deepCopySkillsTree(hero.skillsTree),
+    };
+    setSelectedHero(heroCopy);
     setIsHeroChosen(true);
-    onSelect(hero);
+    onSelect(heroCopy);
   };
 
   if (isHeroChosen && selectedHero) {
@@ -80,7 +109,9 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
             survivre plus loin.
           </li>
         </ul>
-        <ul><strong>Vous devez :</strong></ul>
+        <ul>
+          <strong>Vous devez :</strong>
+        </ul>
         <ul>
           <li>Atteindre la salle finale du donjon,</li>
           <li>Vaincre le gardien ultime,</li>
@@ -118,13 +149,9 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
                 style={{ width: "80px", height: "80px", marginBottom: "12px" }}
               />
               <h2 className="hero-name">{hero.name}</h2>
-              <p className="hero-stat">
-                {hero.attackName} : {hero.attackBase} de dégats
-              </p>
-              <p className="hero-stat">
-                {hero.ultimateName} : {hero.attackUltimate} de dégats
-              </p>
-              <p className="hero-stat">Points de vie : {hero.hpHero}</p>
+              <p className="hero-stat">Points de vie: {hero.hpHero}</p>
+              <p className="hero-stat">{hero.skillsTreeDescription}</p>
+              <p className="hero-stat">Passif: {hero.passif}</p>
             </div>
           ))}
         </div>
