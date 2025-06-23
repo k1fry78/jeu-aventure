@@ -40,6 +40,7 @@ export const guerrierSkillsTree = {
 
   frappePuissante: {
     name: "Frappe puissante",
+    audio: "couppuissant.wav",
     baseDamage: 90,
     damagePerLevel: 20,
     level: 1,
@@ -57,6 +58,7 @@ export const guerrierSkillsTree = {
   },
   coupEcrasant: {
     name: "Coup écrasant",
+    audio: "ecrasant.wav",
     baseDamage: 130,
     damagePerLevel: 30,
     level: 1,
@@ -78,6 +80,7 @@ export const guerrierSkillsTree = {
   // --- Branche Coup Rapide ---
   coupRapide: {
     name: "Coup rapide",
+    audio: "rapide.wav",
     baseDamage: 30,
     damagePerLevel: 7,
     level: 1,
@@ -95,6 +98,7 @@ export const guerrierSkillsTree = {
   },
   enchainement: {
     name: "Enchaînement",
+    audio: "enchainement.mp3",
     baseDamage: 50,
     damagePerLevel: 12,
     level: 1,
@@ -114,6 +118,7 @@ export const guerrierSkillsTree = {
   // --- Branche Défense / Cri ---
   criDeGuerre: {
     name: "Cri de guerre",
+    audio: "cry.wav",
     damage: 0,
     cooldown: 20000,
     upgrade: "attack de base = 45 dégats pendant 12 secondes",
@@ -127,6 +132,7 @@ export const guerrierSkillsTree = {
   },
   protection: {
     name: "Protection",
+    audio: "protection.wav",
     damage: 0,
     cooldown: 20000,
     upgrade: "insensible pendant 8secondes",

@@ -59,7 +59,7 @@ function ChoixPerso({ onSelect, onChoosePath, startMusic }) {
       skillsTree: rodeurSkillsTree,
       xp: 0,
       level: 1,
-      skillsTreeDescription: "Arc, Dague, Pièges",
+      skillsTreeDescription: "Arc, Dague, Familier",
       passif: "Discrétion accrue",
       classe: "rodeur",
       potions: { vie: 3, mana: 3 },

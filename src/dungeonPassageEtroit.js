@@ -6,8 +6,8 @@ import FunctionObjet from "./functionobjet.js";
 function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
   const [scene, setScene] = useState("choix");
   const [objetChoisi, setObjetChoisi] = useState(null);
-  const [vampire1Hp, setVampire1Hp] = useState(80);
-  const [vampire2Hp, setVampire2Hp] = useState(80);
+  const [vampire1Hp, setVampire1Hp] = useState(280);
+  const [vampire2Hp, setVampire2Hp] = useState(280);
   const [vampire1XpGiven, setVampire1XpGiven] = useState(false);
   const [vampire2XpGiven, setVampire2XpGiven] = useState(false);
   const [stunStates, setStunStates] = useState({});
@@ -34,6 +34,8 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
         audio2.volume = 0.3;
         audio2.play();
       };
+      setVampire1Hp((prevHp) => Math.max(prevHp + 10, 0));
+
       setHero((prevHero) =>
         prevHero
           ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 11, 0) }
@@ -67,6 +69,9 @@ function DungeonPassageEtroit({ onChoosePath, hero, setHero }) {
       const audio = new Audio("/hitBarbare.mp3");
       audio.volume = 0.3;
       audio.play();
+
+      setVampire2Hp((prevHp) => Math.max(prevHp + 10, 0));
+
       setHero((prevHero) =>
         prevHero
           ? { ...prevHero, hpHero: Math.max(prevHero.hpHero - 9, 0) }

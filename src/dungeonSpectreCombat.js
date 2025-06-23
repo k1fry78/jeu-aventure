@@ -12,7 +12,7 @@ function DungeonSpectreCombat({ hero, setHero, onChoosePath }) {
   const spectreProtecteureXpGiven = useRef(false);
   const creatureTenebreuseXpGiven = useRef(false);
   const [objetChoisi, setObjetChoisi] = useState(null);
-const [victoireAffichee, setVictoireAffichee] = useState(false);
+  const [victoireAffichee, setVictoireAffichee] = useState(false);
 
   // Pour la scène du hibou
   const [showPassword, setShowPassword] = useState(false);
@@ -30,6 +30,14 @@ const [victoireAffichee, setVictoireAffichee] = useState(false);
     if (!hero || hero.hpHero <= 0) return;
 
     const interval = setInterval(() => {
+      let audio1 = new Audio("/spectreattack.wav");
+      audio1.volume = 0.3;
+      audio1.play();
+      audio1.onended = () => {
+        let audio2 = new Audio("/playerhit.mp3");
+        audio2.volume = 0.3;
+        audio2.play();
+      };
       if (invincibleUntil && Date.now() < invincibleUntil) return;
       let degats = 0;
       if (creatureTenebreuseHp > 0 && !isStunned("Créature ténébreuse"))
@@ -58,7 +66,7 @@ const [victoireAffichee, setVictoireAffichee] = useState(false);
   useEffect(() => {
     if (creatureTenebreuseHp <= 0 && !creatureTenebreuseXpGiven.current) {
       setHero((prevHero) =>
-        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 50 } : prevHero
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 150 } : prevHero
       );
       creatureTenebreuseXpGiven.current = true;
     }
@@ -85,46 +93,50 @@ const [victoireAffichee, setVictoireAffichee] = useState(false);
   }, [spectreProtecteurHp, scene, creatureTenebreuseHp]);
 
   // Victoire
-if (creatureTenebreuseHp <= 0 && spectreProtecteurHp <= 0 && !victoireAffichee) {
-  return (
-    <div className="page-center">
-      <div className="donjon-container">
-        <h2>Victoire !</h2>
-        <p>
-          Tu as vaincu l’esprit protecteur et la créature ténébreuse ! Leur
-          corps se dissipent dans l’air, laissant derrière eux une aura de
-          paix et de sérénité. Tu sens que la menace qui pesait sur le donjon
-          est désormais écartée.
-        </p>
-        <p>
-          Alors que tu te relèves, tu remarques un objet scintillant au sol,
-          vestige de la bataille. Tu t’en approches et le ramasses, prêt à
-          poursuivre ton aventure.
-        </p>
-        <FunctionObjet
-          setHero={setHero}
-          objetChoisi={objetChoisi}
-          setObjetChoisi={setObjetChoisi}
-        />
-        <div className="donjon-btns">
-          <button
-            onClick={() => {
-              setVictoireAffichee(true);
-              setScene("suiteDonjon");
-            }}
-          >
-            Continuer l'aventure
-          </button>
+  if (
+    creatureTenebreuseHp <= 0 &&
+    spectreProtecteurHp <= 0 &&
+    !victoireAffichee
+  ) {
+    return (
+      <div className="page-center">
+        <div className="donjon-container">
+          <h2>Victoire !</h2>
+          <p>
+            Tu as vaincu l’esprit protecteur et la créature ténébreuse ! Leur
+            corps se dissipent dans l’air, laissant derrière eux une aura de
+            paix et de sérénité. Tu sens que la menace qui pesait sur le donjon
+            est désormais écartée.
+          </p>
+          <p>
+            Alors que tu te relèves, tu remarques un objet scintillant au sol,
+            vestige de la bataille. Tu t’en approches et le ramasses, prêt à
+            poursuivre ton aventure.
+          </p>
+          <FunctionObjet
+            setHero={setHero}
+            objetChoisi={objetChoisi}
+            setObjetChoisi={setObjetChoisi}
+          />
+          <div className="donjon-btns">
+            <button
+              onClick={() => {
+                setVictoireAffichee(true);
+                setScene("suiteDonjon");
+              }}
+            >
+              Continuer l'aventure
+            </button>
+          </div>
+          <img
+            src="/esprit-louve-vaincu.jpg"
+            alt="Esprit de la louve vaincu"
+            className="donjon-img"
+          />
         </div>
-        <img
-          src="/esprit-louve-vaincu.jpg"
-          alt="Esprit de la louve vaincu"
-          className="donjon-img"
-        />
       </div>
-    </div>
-  );
-}
+    );
+  }
 
   // Suite du donjon : couloir avec statue de hibou
   if (scene === "suiteDonjon") {
@@ -133,10 +145,14 @@ if (creatureTenebreuseHp <= 0 && spectreProtecteurHp <= 0 && !victoireAffichee) 
         <div className="donjon-container">
           <h2>Le couloir mystérieux</h2>
           <p>
-            Tu avances dans un long couloir de pierre, faiblement éclairé par des torches vacillantes.
-            Sur le mur, tu remarques une{" "}
+            Tu avances dans un long couloir de pierre, faiblement éclairé par
+            des torches vacillantes. Sur le mur, tu remarques une{" "}
             <span
-              style={{ color: "#eab308", textDecoration: "underline", cursor: "pointer" }}
+              style={{
+                color: "#eab308",
+                textDecoration: "underline",
+                cursor: "pointer",
+              }}
               onClick={() => setShowPassword(true)}
               title="Examiner la statue"
             >
@@ -149,14 +165,17 @@ if (creatureTenebreuseHp <= 0 && spectreProtecteurHp <= 0 && !victoireAffichee) 
               <button
                 onClick={() => setScene("trappeDonjon")}
                 style={{ marginLeft: 12 }}
-              > Continuer dans le couloir
+              >
+                {" "}
+                Continuer dans le couloir
               </button>
             </div>
           )}
           {showPassword && (
             <div style={{ marginTop: 16 }}>
               <p>
-                Une voix grave résonne dans ta tête : <em>« Seul l’initié connaîtra le mot secret… »</em>
+                Une voix grave résonne dans ta tête :{" "}
+                <em>« Seul l’initié connaîtra le mot secret… »</em>
               </p>
               <input
                 type="text"
@@ -210,10 +229,14 @@ if (creatureTenebreuseHp <= 0 && spectreProtecteurHp <= 0 && !victoireAffichee) 
         <div className="donjon-container">
           <h2>Salle secrète du hibou</h2>
           <p>
-            La statue pivote lentement, révélant un passage caché. Tu t’y engouffres et découvres une salle secrète, remplie de trésors oubliés et de mystérieux symboles gravés sur les murs.
+            La statue pivote lentement, révélant un passage caché. Tu t’y
+            engouffres et découvres une salle secrète, remplie de trésors
+            oubliés et de mystérieux symboles gravés sur les murs.
           </p>
           <div className="donjon-btns">
-            <button onClick={() => onChoosePath && onChoosePath("salleSecreteHibou")}>
+            <button
+              onClick={() => onChoosePath && onChoosePath("salleSecreteHibou")}
+            >
               Explorer la salle secrète
             </button>
           </div>
@@ -234,11 +257,14 @@ if (creatureTenebreuseHp <= 0 && spectreProtecteurHp <= 0 && !victoireAffichee) 
         <div className="donjon-container">
           <h2>La trappe piégée</h2>
           <p>
-            Tu poursuis ton chemin sans prêter attention à la statue. Soudain, le sol se dérobe sous tes pieds !
-            Tu tombes dans une trappe et atterris lourdement dans une cellule sombre, au cœur du donjon.
+            Tu poursuis ton chemin sans prêter attention à la statue. Soudain,
+            le sol se dérobe sous tes pieds ! Tu tombes dans une trappe et
+            atterris lourdement dans une cellule sombre, au cœur du donjon.
           </p>
           <div className="donjon-btns">
-            <button onClick={() => onChoosePath && onChoosePath("dungeonCellules")}>
+            <button
+              onClick={() => onChoosePath && onChoosePath("dungeonCellules")}
+            >
               Se relever et explorer les cellules
             </button>
           </div>

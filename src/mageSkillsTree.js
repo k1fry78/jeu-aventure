@@ -37,6 +37,7 @@ export const mageSkillsTree = {
   },
   brulure: {
     name: "Brûlure",
+    audio: "brulure.wav",
     baseDamage: 80,
     damagePerLevel: 20,
     level: 1,
@@ -54,6 +55,7 @@ export const mageSkillsTree = {
   },
   inferno: {
     name: "Inferno",
+    audio: "inferno.wav",
     baseDamage: 100,
     damagePerLevel: 25,
     level: 1,
@@ -72,6 +74,7 @@ export const mageSkillsTree = {
   },
   gele: {
     name: "Gèle",
+    audio: "gel.wav",
     damage: 0, // Pas de dégâts, pas besoin de level
     cooldown: 8000,
     stun: 3000,
@@ -85,6 +88,7 @@ export const mageSkillsTree = {
   },
   tempeteDeGlace: {
     name: "Tempête de glace",
+    audio: "blizzard.wav",
     baseDamage: 90,
     damagePerLevel: 20,
     level: 1,
@@ -104,6 +108,7 @@ export const mageSkillsTree = {
   },
   eclair: {
     name: "Éclair",
+    audio: "eclair.mp3",
     baseDamage: 30,
     damagePerLevel: 10,
     level: 1,
@@ -122,6 +127,7 @@ export const mageSkillsTree = {
   },
   chaineEclair: {
     name: "Chaîne d'éclairs",
+    audio: "chaineeclair.mp3",
     baseDamage: 70,
     damagePerLevel: 15,
     level: 1,

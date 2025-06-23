@@ -2,7 +2,10 @@ import React, { useState, useRef } from "react";
 
 function getSkillDamage(skill) {
   if (typeof skill.baseDamage === "number") {
-    return skill.baseDamage + ((skill.level ? skill.level - 1 : 0) * (skill.damagePerLevel || 0));
+    return (
+      skill.baseDamage +
+      (skill.level ? skill.level - 1 : 0) * (skill.damagePerLevel || 0)
+    );
   }
   return 0;
 }
@@ -15,14 +18,18 @@ function CombatButtons({
   stunStates,
   setStunStates,
   setInvincibleUntil,
-  setHero, // Ajoute ceci pour mettre à jour la mana du héros
+  setHero,
 }) {
   const [skillsCooldowns, setSkillsCooldowns] = useState({});
   const [selectedSkill, setSelectedSkill] = useState(null);
   const skillRefs = useRef({});
   const enemyRefs = useRef({});
   const [damageDisplays, setDamageDisplays] = useState({});
-  const [baseOverride, setBaseOverride] = useState(null); // Pour le buff criDeGuerre
+  const [baseOverride, setBaseOverride] = useState(null);
+  const lancerCombatAudioRef = useRef(null);
+
+  // Pour stocker les intervalles d'invocation
+  const invocationIntervals = useRef([]);
 
   // Vérifie si un ennemi est stun
   const isStunned = (enemyName) => {
@@ -48,6 +55,58 @@ function CombatButtons({
   const handleSelectSkill = (key, skill) => {
     if (scene !== "lancerCombat" || skillsCooldowns[key]) return;
     setSelectedSkill({ key, skill });
+  };
+
+  // Fonction pour gérer les invocations (loup/grizzly)
+  const handleInvocation = (skill, enemyIndex) => {
+    // Détermine la fréquence d'attaque (loup: 3s, grizzly: 4s)
+    const intervalTime = skill.name.toLowerCase().includes("grizzly")
+      ? 4000
+      : 3000;
+    const damage = getSkillDamage(skill);
+
+    // Pour grizzly, attaque tous les ennemis vivants, pour loup, un seul
+    const isGrizzly = skill.name.toLowerCase().includes("grizzly");
+
+    // On arrête l'invocation après 15 secondes (modifiable)
+    const duration = 15000;
+    let elapsed = 0;
+
+    const loupAudio = new Audio("/wolfattack.wav");
+    const grizzlyAudio = new Audio("/grizattack.mp3");
+
+    const interval = setInterval(() => {
+      elapsed += intervalTime;
+      if (isGrizzly) {
+        enemies.forEach((enemy) => {
+          if (enemy.hp > 0) {
+            enemy.setHp((hp) => Math.max(hp - damage, 0));
+            showDamage(enemy.name, -damage);
+            grizzlyAudio.currentTime = 0;
+            grizzlyAudio.play();
+          }
+        });
+      } else {
+        // Loup attaque un seul ennemi
+        if (enemies[enemyIndex] && enemies[enemyIndex].hp > 0) {
+          enemies[enemyIndex].setHp((hp) => Math.max(hp - damage, 0));
+          showDamage(enemies[enemyIndex].name, -damage);
+          loupAudio.currentTime = 0;
+          loupAudio.play();
+        }
+      }
+      // Arrête si durée dépassée ou ennemi mort (pour loup)
+      if (
+        elapsed >= duration ||
+        (!isGrizzly && (!enemies[enemyIndex] || enemies[enemyIndex].hp <= 0))
+      ) {
+        clearInterval(interval);
+      }
+    }, intervalTime);
+
+    invocationIntervals.current.push(interval);
+    // Arrête l'invocation après la durée max (sécurité)
+    setTimeout(() => clearInterval(interval), duration + 100);
   };
 
   // Application du skill à l'ennemi ciblé
@@ -87,18 +146,25 @@ function CombatButtons({
       audio.play();
     }
 
+    // Gestion des invocations
+    if (key === "invoqueLoup" || key === "invoqueGrizzly") {
+      handleInvocation(skill, enemyIndex);
+    }
+
     // Si le skill est multiple, applique les dégâts à tous les ennemis vivants
-    if (skill.multiple) {
+    if (skill.multiple && key !== "invoqueGrizzly") {
       enemies.forEach((enemy) => {
         if (enemy.hp > 0) {
           let dmg = getSkillDamage(skill);
-          // Applique le buff si attaque de base
-          if (key === "base" && baseOverride && baseOverride.expires > Date.now()) {
+          if (
+            key === "base" &&
+            baseOverride &&
+            baseOverride.expires > Date.now()
+          ) {
             dmg = baseOverride.damage;
           }
           enemy.setHp((hp) => Math.max(hp - dmg, 0));
           showDamage(enemy.name, -dmg);
-          // Applique le stun si présent
           if (skill.stun) {
             setStunStates((prev) => ({
               ...prev,
@@ -107,15 +173,13 @@ function CombatButtons({
           }
         }
       });
-    } else {
+    } else if (key !== "invoqueLoup" && key !== "invoqueGrizzly") {
       let dmg = getSkillDamage(skill);
-      // Applique le buff si attaque de base
       if (key === "base" && baseOverride && baseOverride.expires > Date.now()) {
         dmg = baseOverride.damage;
       }
       enemies[enemyIndex].setHp((hp) => Math.max(hp - dmg, 0));
       showDamage(enemies[enemyIndex].name, -dmg);
-      // Applique le stun si présent
       if (skill.stun) {
         setStunStates((prev) => ({
           ...prev,
@@ -147,7 +211,13 @@ function CombatButtons({
   return (
     <div className="combat-center">
       <button
-        onClick={() => setScene("lancerCombat")}
+        onClick={() => {
+          setScene("lancerCombat");
+          if (lancerCombatAudioRef.current) {
+            lancerCombatAudioRef.current.currentTime = 0;
+            lancerCombatAudioRef.current.play();
+          }
+        }}
         className={scene === "lancerCombat" ? "combat-launched" : ""}
         disabled={scene === "lancerCombat"}
       >
@@ -170,7 +240,9 @@ function CombatButtons({
                   onClick={() => handleSelectSkill(key, skill)}
                   disabled={scene !== "lancerCombat" || skillsCooldowns[key]}
                   title={`${skill.description}\nDégâts : ${
-                    key === "base" && baseOverride && baseOverride.expires > Date.now()
+                    key === "base" &&
+                    baseOverride &&
+                    baseOverride.expires > Date.now()
                       ? baseOverride.damage
                       : getSkillDamage(skill)
                   }\nMana : ${skill.cost || 0}`}
@@ -181,11 +253,13 @@ function CombatButtons({
                       ({skillsCooldowns[key]}s)
                     </span>
                   )}
-                  {key === "base" && baseOverride && baseOverride.expires > Date.now() && (
-                    <span style={{ marginLeft: "8px", color: "#2196f3" }}>
-                      +Buff!
-                    </span>
-                  )}
+                  {key === "base" &&
+                    baseOverride &&
+                    baseOverride.expires > Date.now() && (
+                      <span style={{ marginLeft: "8px", color: "#2196f3" }}>
+                        +Buff!
+                      </span>
+                    )}
                   {skill.cost ? (
                     <span style={{ marginLeft: "8px", color: "#38bdf8" }}>
                       -{skill.cost} mana
@@ -194,6 +268,7 @@ function CombatButtons({
                 </button>
               )
           )}
+        <audio ref={lancerCombatAudioRef} src="/lancerCombat.mp3" />
       </div>
       <div className="enemies-row">
         {enemies.map((enemy, idx) => (

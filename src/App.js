@@ -16,14 +16,15 @@ function App() {
   const [hero, setHero] = useState(null);
   const [phase, setPhase] = useState("choixPerso");
   const audioRef = useRef(null);
+  const potionAudioRef = useRef(null);
 
   useEffect(() => {
-    if (hero && hero.xp >= 100) {
+    if (hero && hero.xp >= 200) {
       setHero((prevHero) =>
         prevHero
           ? {
               ...prevHero,
-              level: (prevHero.level || 1) + Math.floor(prevHero.xp / 100),
+              level: (prevHero.level || 1) + Math.floor(prevHero.xp / 200),
               xp: prevHero.xp,
             }
           : prevHero
@@ -146,13 +147,13 @@ function App() {
 
   // Pour débloquer un skill
   const unlockSkill = (skillKey) => {
-    if (!hero || hero.xp < 100) return;
+    if (!hero || hero.xp < 200) return;
     setHero((prev) => {
       const skill = prev.skillsTree[skillKey];
       if (!skill || skill.unlocked) return prev;
       return {
         ...prev,
-        xp: prev.xp - 100,
+        xp: prev.xp - 200,
         skillsTree: {
           ...prev.skillsTree,
           [skillKey]: {
@@ -166,14 +167,14 @@ function App() {
 
   // Pour améliorer un skill de niveau
   const upgradeSkill = (skillKey) => {
-    if (!hero || hero.xp < 100) return;
+    if (!hero || hero.xp < 200) return;
     setHero((prev) => {
       const skill = prev.skillsTree[skillKey];
       if (!skill || !skill.unlocked || typeof skill.level !== "number")
         return prev;
       return {
         ...prev,
-        xp: prev.xp - 100,
+        xp: prev.xp - 200,
         skillsTree: {
           ...prev.skillsTree,
           [skillKey]: {
@@ -185,102 +186,63 @@ function App() {
     });
   };
 
-  // Calcul dynamique des dégâts
-  const getSkillDamage = (skill) => {
-    if (typeof skill.baseDamage === "number") {
-      return (
-        skill.baseDamage +
-        (skill.level ? skill.level - 1 : 0) * (skill.damagePerLevel || 0)
-      );
-    }
-    return 0;
-  };
 
   const renderSkillNode = (skillsTree, key, depth = 0) => {
-    const skill = skillsTree[key];
-    if (!skill) return null;
+  const skill = skillsTree[key];
+  if (!skill) return null;
 
-    return (
-      <div
-        key={key}
-        className={`skill-node ${key}`}
-        style={{ marginLeft: depth * 24, marginTop: 8 }}
-      >
-        {skill.unlocked ? (
-          <span>
-            {skill.name}
-            {/* Affiche le niveau si le skill a un level */}
-            {typeof skill.level === "number" && (
-              <span style={{ marginLeft: 8, color: "#2196f3" }}>
-                (lvl {skill.level})
-              </span>
-            )}
-            {/* Affiche les dégâts dynamiques */}
-            {typeof skill.baseDamage === "number" && (
-              <span style={{ marginLeft: 8, color: "#eab308" }}>
-                Dégâts : {getSkillDamage(skill)}
-              </span>
-            )}
-            {skill.cost ? (
-              <span style={{ marginLeft: "8px", color: "#38bdf8" }}>
-                -{skill.cost} mana
-              </span>
-            ) : null}
-            {/* Bouton d'amélioration si le skill a un level */}
-            {typeof skill.level === "number" && (
-              <button
-                style={{
-                  marginLeft: 8,
-                  background: hero.xp >= 100 ? "#16a34a" : "#aaa",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "4px",
-                  padding: "2px 8px",
-                  cursor: hero.xp >= 100 ? "pointer" : "not-allowed",
-                  fontSize: "0.9em",
-                }}
-                disabled={hero.xp < 100}
-                onClick={() => upgradeSkill(key)}
-                title={
-                  hero.xp < 100
-                    ? "100 XP requis pour améliorer"
-                    : "Améliorer ce skill"
-                }
-              >
-                +
-              </button>
-            )}
-          </span>
-        ) : (
+  return (
+    <div
+      key={key}
+      className={`skill-node${skill.unlocked ? " unlocked" : ""}`}
+      style={{ marginLeft: depth * 14 }}
+    >
+      <div className="skill-content">
+        <span className="skill-icon">
+          {skill.unlocked ? "🟢" : "🔒"}
+        </span>
+        <span className="skill-name">{skill.name}</span>
+        {typeof skill.level === "number" && skill.unlocked && (
+          <span className="skill-level">lvl{skill.level}</span>
+        )}
+        {skill.unlocked && typeof skill.level === "number" && (
           <button
-            disabled={hero.xp < 100}
-            onClick={() => unlockSkill(key)}
-            style={{
-              background: hero.xp >= 100 ? "#3b82f6" : "#aaa",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              padding: "4px 8px",
-              cursor: hero.xp >= 100 ? "pointer" : "not-allowed",
-            }}
+            className="skill-btn upgrade"
+            disabled={hero.xp < 200}
+            onClick={() => upgradeSkill(key)}
             title={
-              hero.xp < 100 ? "100 XP requis" : "Débloquer cette compétence"
+              hero.xp < 200
+                ? "200 XP requis pour améliorer"
+                : "Améliorer ce skill"
             }
           >
-            {skill.name}
+            +
           </button>
         )}
-        {/* Affiche récursivement les enfants SEULEMENT si ce skill est unlocked */}
-        {skill.unlocked && skill.children && skill.children.length > 0 && (
-          <div>
-            {skill.children.map((childKey) =>
-              renderSkillNode(skillsTree, childKey, depth + 1)
-            )}
-          </div>
+        {!skill.unlocked && (
+          <button
+            className="skill-btn unlock"
+            disabled={hero.xp < 200}
+            onClick={() => unlockSkill(key)}
+            title={
+              hero.xp < 200 ? "200 XP requis" : "Débloquer cette compétence"
+            }
+          >
+            +
+          </button>
         )}
       </div>
-    );
-  };
+      {/* Connecteur visuel */}
+      {skill.unlocked && skill.children && skill.children.length > 0 && (
+        <div className="skill-children">
+          {skill.children.map((childKey) =>
+            renderSkillNode(skillsTree, childKey, depth + 1)
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
   const renderSkillsTree = () => {
     if (!hero) return null;
@@ -335,17 +297,21 @@ function App() {
               key={`vie-${i}`}
               src="/potion-vie.png"
               alt="Potion de vie"
-              style={{ width: "60px", height: "60px", marginTop: "8px" }}
+              style={{ width: "50px", height: "60px", marginTop: "8px" }}
               onClick={() => {
                 if (hero?.potions?.vie > 0) {
                   setHero((prev) => ({
                     ...prev,
-                    hpHero: (prev.hpHero || 0) + 20, 
+                    hpHero: (prev.hpHero || 0) + 20,
                     potions: {
                       ...prev.potions,
                       vie: prev.potions.vie - 1,
                     },
                   }));
+                  if (potionAudioRef.current) {
+                    potionAudioRef.current.currentTime = 0;
+                    potionAudioRef.current.play();
+                  }
                 }
               }}
             />
@@ -355,22 +321,28 @@ function App() {
               key={`mana-${i}`}
               src="/potion-mana.png"
               alt="Potion de mana"
-              style={{ width: "60px", height: "60px", marginTop: "8px" }}
+              style={{ width: "50px", height: "60px", marginTop: "8px" }}
               onClick={() => {
                 if (hero?.potions?.mana > 0) {
                   setHero((prev) => ({
                     ...prev,
-                    manaHero: (prev.manaHero || 0) + 30, 
+                    manaHero: (prev.manaHero || 0) + 30,
                     potions: {
                       ...prev.potions,
                       mana: prev.potions.mana - 1,
                     },
                   }));
+                  if (potionAudioRef.current) {
+                    potionAudioRef.current.currentTime = 0;
+                    potionAudioRef.current.play();
+                  }
                 }
               }}
             />
           ))}
         </div>
+        {/* Sons pour les potions */}
+        <audio ref={potionAudioRef} src="/potion.mp3" />
       </section>
     </>
   );

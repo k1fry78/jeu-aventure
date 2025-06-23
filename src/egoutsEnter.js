@@ -47,7 +47,7 @@ function EnterEgouts({ hero, setHero, onChoosePath }) {
   useEffect(() => {
     if (ratHp <= 0 && !ratXpGiven.current) {
       setHero((prevHero) =>
-        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 100 } : prevHero
+        prevHero ? { ...prevHero, xp: (prevHero.xp || 0) + 180 } : prevHero
       );
       ratXpGiven.current = true;
     }

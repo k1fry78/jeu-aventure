@@ -40,6 +40,7 @@ export const rodeurSkillsTree = {
   },
   tirEmpoisonne: {
     name: "Tir empoisonné",
+    audio: "arrowpoison.mp3",
     baseDamage: 70,
     damagePerLevel: 15,
     level: 1,
@@ -67,7 +68,7 @@ export const rodeurSkillsTree = {
     unlocked: false,
     children: [],
     requires: ["tirEmpoisonne"],
-    audio: "arrow-multiple.mp3",
+    audio: "arrows-multiple.mp3",
     multiple: true,
     category: "arc",
     cost: 15,
@@ -79,6 +80,7 @@ export const rodeurSkillsTree = {
   // --- Branche Dague ---
   daguePerforante: {
     name: "Dague perforante",
+    audio: "dague.mp3",
     baseDamage: 120,
     damagePerLevel: 25,
     level: 1,
@@ -96,6 +98,7 @@ export const rodeurSkillsTree = {
   },
   doubleDague: {
     name: "Double dague",
+    audio: "doubledague.mp3",
     baseDamage: 50,
     damagePerLevel: 10,
     level: 1,
@@ -115,6 +118,7 @@ export const rodeurSkillsTree = {
   // --- Branche Familier ---
   invoqueLoup: {
     name: "Invoque ton loup",
+    audio: "wolfinvoc.mp3",
     baseDamage: 40,
     damagePerLevel: 8,
     level: 1,
@@ -133,16 +137,17 @@ export const rodeurSkillsTree = {
   },
   invoqueGrizzly: {
     name: "Invoque ton grizzly",
+    audio: "grizinvoc.mp3",
     baseDamage: 100,
     damagePerLevel: 20,
     level: 1,
     cooldown: 20000,
     description:
-      "Envoie ton grizzly sur un ennemi, il mord l'ennemi toutes les 6 secondes",
+      "Envoie ton grizzly sur un ennemi, il griffe plusieurs ennemis toutes les 4 secondes",
     unlocked: false,
     children: [],
     requires: ["invoqueLoup"],
-    multiple: false,
+    multiple: true,
     category: "familier",
     cost: 30,
     get damage() {

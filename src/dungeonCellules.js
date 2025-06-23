@@ -32,8 +32,15 @@ function DungeonCellules({ onChoosePath, hero, setHero }) {
     if (!hero || hero.hpHero <= 0) return;
 
     const interval = setInterval(() => {
+      let audio1 = new Audio("/gardes.mp3");
+      audio1.volume = 0.3;
+      audio1.play();
+      audio1.onended = () => {
+        let audio2 = new Audio("/playerhit.mp3");
+        audio2.volume = 0.3;
+        audio2.play();
+      };
       if (invincibleUntil && Date.now() < invincibleUntil) return;
-
       let degats = 0;
       if (garde1Hp > 0 && !isStunned("Garde 1")) degats += 10;
       if (garde2Hp > 0 && !isStunned("Garde 2")) degats += 12;
@@ -46,7 +53,16 @@ function DungeonCellules({ onChoosePath, hero, setHero }) {
     }, 1500);
 
     return () => clearInterval(interval);
-  }, [scene, garde1Hp, garde2Hp, garde3Hp, hero, setHero, stunStates, invincibleUntil]);
+  }, [
+    scene,
+    garde1Hp,
+    garde2Hp,
+    garde3Hp,
+    hero,
+    setHero,
+    stunStates,
+    invincibleUntil,
+  ]);
 
   // Donne de l'XP à la victoire, une seule fois
   useEffect(() => {
@@ -70,7 +86,6 @@ function DungeonCellules({ onChoosePath, hero, setHero }) {
     }
   }, [garde1Hp, garde2Hp, garde3Hp, setHero]);
 
-
   // Gestion du timer pour chaque étape du piège
   useEffect(() => {
     if (scene === "courirPiege" && !piegeRate && piegeStep < 3) {
@@ -89,7 +104,6 @@ function DungeonCellules({ onChoosePath, hero, setHero }) {
     }
     // eslint-disable-next-line
   }, [rate, scene]);
-
 
   // --- Évasion discrète après avoir libéré les gobelins ---
   if (scene === "libreGobelins") {

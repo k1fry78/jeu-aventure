@@ -1,3 +1,10 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  background-color: #121212;
+  color: #e0e0e0;
+}
 .game-section-fixed {
   position: fixed;
   left: 0;
@@ -15,6 +22,8 @@
   max-width: 340px;
   min-width: 220px;
   margin: 0;
+  border-right: 2px solid #eab308;
+  border-top: 2px solid #eab308;
 }
 
 .game-section-fixed h1 {
@@ -42,52 +51,88 @@
 }
 /* SKILLS TREE */
 .skills-tree-mage {
-  float: left;
-  width: 270px;
-  margin-bottom: 20px;
-  margin-right: 32px;
-  background: #23232b;
-  border-radius: 12px;
-  padding: 18px 12px 10px 12px;
-  color: #facc15;
-  font-family: "Segoe UI", Arial, sans-serif;
-  box-shadow: 0 2px 8px #0004;
+  background: linear-gradient(135deg, #232526 0%, #414345 100%);
+  padding: 20px 8px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.13);
+  max-width: 400px;
+  margin: 0 auto;
 }
 .skills-title {
-  font-size: 1.2em;
+  color: #fff;
+  font-size: 1.15em;
   font-weight: bold;
-  margin-bottom: 10px;
-  color: #facc15;
+  margin-bottom: 16px;
   text-align: center;
-  letter-spacing: 1px;
-}
-.skills-root {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  letter-spacing: 0.5px;
 }
 .skill-node {
-  background: #353545;
-  border-radius: 8px;
-  padding: 6px 14px;
-  margin: 4px auto;
-  font-size: 1em;
-  font-weight: 500;
-  color: #fff;
-  min-width: 90px;
-  text-align: center;
-  box-shadow: 0 1px 4px #0002;
+  position: relative;
+  margin-bottom: 10px;
+  transition: transform 0.12s;
 }
-.skills-branches {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-top: 10px;
+.skill-node.unlocked {
+  filter: drop-shadow(0 1px 4px #16a34a22);
 }
-.skills-branches > div {
+.skill-content {
   display: flex;
-  flex-direction: column;
   align-items: center;
+  background: #fff;
+  border-radius: 7px;
+  padding: 5px 10px;
+  box-shadow: 0 1px 4px rgba(50, 50, 50, 0.06);
+  font-weight: 500;
+  gap: 7px;
+  min-width: 120px;
+  font-size: 0.97em;
+}
+.skill-icon {
+  font-size: 1em;
+}
+.skill-name {
+  flex: 1;
+  color: #232526;
+}
+.skill-level {
+  background: #e0e7ff;
+  color: #3730a3;
+  border-radius: 6px;
+  padding: 1px 4px;
+  font-size: 0.85em;
+  margin-left: 5px;
+}
+.skill-btn {
+  border: none;
+  border-radius: 4px;
+  padding: 2px 7px;
+  font-size: 0.95em;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.skill-btn.upgrade {
+  background: #16a34a;
+  color: #fff;
+}
+.skill-btn.upgrade:disabled {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
+.skill-btn.unlock {
+  background: #3b82f6;
+  color: #fff;
+}
+.skill-btn.unlock:disabled {
+  background: #aaa;
+  color: #eee;
+  cursor: not-allowed;
+}
+.skill-children {
+  margin-left: 10px;
+  border-left: 2px dashed #a5b4fc;
+  padding-left: 6px;
+  margin-top: 3px;
 }
 
 .utilitaires-right {

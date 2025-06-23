@@ -31,6 +31,14 @@ function SortieSalleSecrete({ hero, setHero, onChoosePath }) {
     if (scene !== "lancerCombat") return;
     if (victoire || defaite) return;
     const interval = setInterval(() => {
+      let audio1 = new Audio("/invocattack.wav");
+      audio1.volume = 0.3;
+      audio1.play();
+      audio1.onended = () => {
+      let audio2 = new Audio("/playerhit.mp3");
+      audio2.volume = 0.3;
+      audio2.play();
+      };
       if (invincibleUntil && Date.now() < invincibleUntil) return;
 
       // Attaque puissante du mage (aléatoire)
@@ -225,9 +233,7 @@ function SortieSalleSecrete({ hero, setHero, onChoosePath }) {
           />{" "}
           <div className="donjon-btns">
             <button
-              onClick={() =>
-                onChoosePath && onChoosePath("portailTeleporteur")
-              }
+              onClick={() => onChoosePath && onChoosePath("portailTeleporteur")}
             >
               Continuer l’aventure
             </button>

@@ -9,10 +9,9 @@
 .donjon-container {
   background: rgba(30, 30, 40, 0.98);
   border-radius: 18px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   padding: 32px 40px 24px 40px;
   margin-top: 32px;
-  max-width: 1200px; /* Augmente la largeur maximale */
+  max-width: 1000px; /* Augmente la largeur maximale */
   min-width: 340px; /* Largeur minimale pour petits écrans */
   width: fit-content; /* S'adapte au contenu */
   display: flex;
@@ -93,7 +92,6 @@
   font-weight: bold;
   box-shadow: 0 0 0 2px #22c55e, 0 0 8px #22c55e;
 }
-
 
 /* Message d'alerte */
 .combat-alert {
